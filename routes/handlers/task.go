@@ -1,44 +1,36 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"github.com/suhas-developer07/Golang/db"
 )
 
-type PostTaskPayload struct {
-	Title       string `json:"Title" binding:"required`
-	Description string `json:"Description binding:"required"`
-	Status      string `json:"status" binding:"required"`
-}
+func SaveTask(ctx *gin.Context){
+		var payload db.PostTaskPayload
+		if err := ctx.ShouldBindJSON(&payload);
 
-func Mountroutes() *gin.Engine {
-	handler := gin.Default()
-
-	handler.GET("/", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": "Ok from gin",
-		})
-	})
-
-	handler.POST("/task", func(ctx *gin.Context) {
-		var payload PostTaskPayload
-		err := ctx.ShouldBindJSON(&payload)
-
-		if err != nil {
+		 err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
 				"message": "unable to read the body",
 				"error":   err,
 			})
 			return
 		}
-		log.Printf(payload.Status)
-		log.Println(payload.Title)
+	   
+		id, err := db.TaskRepository.SaveTaskQuery(payload)
+
+		if err !=nil {
+			ctx.JSON(http.StatusInternalServerError,gin.H{
+				"error":true,
+				"msg":err.Error(),
+			})
+			return
+		}
 
 		ctx.JSON(http.StatusOK, gin.H{
 			"error": "false",
+			"id":id,
 		})
-	})
-	return handler
 }
+

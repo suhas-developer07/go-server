@@ -7,19 +7,19 @@ import (
 	"os"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/suhas-developer07/Golang/config"
 )
 
 var DB *pgx.Conn
 
-func InitDb() {
-	urlExample := "postgres://suhas:secrete123@localhost:5432/mydb"  //postgress url 
+func InitDb() {  
 	var err error
-	DB, err = pgx.Connect(context.Background(), urlExample)
+	DB, err = pgx.Connect(context.Background(), config.Config.POSTGRES_URL )
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
 	}
-	defer DB.Close(context.Background())  //this will runs on unmount means when we off the server 
+    
 
 	err = DB.Ping(context.Background())
 	if err != nil {

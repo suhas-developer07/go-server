@@ -9,6 +9,7 @@ import (
 
 type envConfig struct {  //innitializing a structure to access variable 
 	APP_PORT string
+	POSTGRES_URL string
 }
 
 func (e *envConfig) LoadConfig() {
@@ -19,6 +20,7 @@ func (e *envConfig) LoadConfig() {
 	}
 
 	e.APP_PORT = loadstring("APP_PORT", ":8080")
+	e.POSTGRES_URL = loadstring("POSTGRES_URL","postgres://devuser:devpas@localhost:5432/devdb")
 }
 
 var Config envConfig //make that varible first letter capital becouse of to access that in another package 
