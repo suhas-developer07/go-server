@@ -34,3 +34,21 @@ func SaveTask(ctx *gin.Context){
 		})
 }
 
+func ReadTask(ctx *gin.Context){
+   
+	tasks,err := db.TaskRepository.ReadTaskQuery()
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError,gin.H{
+			"error":"true",
+			"message":err.Error(),
+		})
+		return 
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"error":false,
+		"data":tasks,
+	})
+		
+}
+
