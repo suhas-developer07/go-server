@@ -2,7 +2,7 @@ package db
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"time"
 )
 
@@ -43,7 +43,7 @@ var TaskRepository = Task{}
    query := `Select id, title, description, status, created_at FROM tasks ORDER BY created_at DESC LIMIT 10;`
 
    rows,err := DB.Query(context.Background(),query)
-   log.Print(rows)
+
 
    if err !=nil {
 	return nil,err
@@ -62,4 +62,57 @@ var TaskRepository = Task{}
    }
 
    return tasks,nil
+ }
+
+ type DelteTaskType struct {
+	ID int `json:id`
+ }
+func (t Task) DeleteTaskQuery(id int) (error) {
+    query := `DELETE FROM tasks WHERE id = $1`
+    result, err := DB.Exec(context.Background(), query, id)
+    if err != nil {
+        return err
+    }
+
+    rowsAffected := result.RowsAffected()
+    
+    if rowsAffected == 0 {
+        // Handle the case where no row was deleted (e.g., log it, return a specific error)
+        return fmt.Errorf("task with ID %d not found", id)
+    }
+    return nil
+}
+
+
+ type UpdateTaskType struct {
+	ID int `json:"id"`
+	Title string `json:"title"`
+	Description string `json:"description"`
+	Status string `json:"status"`
+ }
+
+ func (t Task) GetTaskById(id int) (TaskType,error){
+	var task TaskType
+	query := `Select id title description status created_at FROM tasks WHERE id=$1`
+
+	err := DB.QueryRow(context.Background(),query,id).Scan(
+		&task.ID,
+		&task.Title,
+		&task.Description,
+		&task.CreatedAt,
+	)
+	if err != nil {
+		return  TaskType{},err
+	}
+	return  task, nil
+ }
+
+ func (t Task) UpdateTask(payload UpdateTaskType)(error){
+
+	query := `UPDATE tasks SET title=$1,description=$2 status=$3 WHERE id=$4`
+
+	_ ,err := DB.Exec(context.Background(),query,payload.Title,payload.Description,payload.Status,payload.ID)
+
+		return err
+	
  }

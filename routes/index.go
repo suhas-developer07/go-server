@@ -16,16 +16,21 @@ handler := gin.Default()
 			"message": "Ok from gin",
 		})
 	})
+  //grouping the task routes
+	TaskRoutes := handler.Group("/task")   
+	{
+		TaskRoutes.POST("/", handlers.SaveTask)
+	    TaskRoutes.GET("/",handlers.ReadTask)
+		TaskRoutes.DELETE("/",handlers.DeletTask)
+	    TaskRoutes.PATCH("/",handlers.UpdateTask)
 
-	handler.POST("/task", handlers.SaveTask)
-
+	}
+ //handles the no route api
 	handler.NoRoute(func(ctx *gin.Context) {
 		ctx.JSON(http.StatusNotFound,gin.H{
 			"message":"Route not found",
 		})
 	})
-
-	handler.GET("/task",handlers.ReadTask)
 
 	return  handler
 }
